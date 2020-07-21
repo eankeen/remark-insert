@@ -23,7 +23,11 @@ export default function remarkInsert(opts: IRemarkInsert) {
 				ast.children[i].type === 'heading' &&
 				ast.children[i].children[0].value === opts.headingText
 			) {
-				ast.children[i + 1] = opts.insertionAst
+				if (ast.children[i + 1]?.type === 'heading') {
+					ast.children.splice(i + 1, 0, opts.insertionAst)
+				} else {
+					ast.children[i + 1] = opts.insertionAst
+				}
 				return
 			}
 		}

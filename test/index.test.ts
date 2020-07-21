@@ -92,6 +92,22 @@ describe('remark-insert', () => {
 		expect(vfile.contents).toBe(output)
 	})
 
+	test('it works with a postfixed heading', async () => {
+		const input = '# Heading\n## Boop\n\n## Conclusion'
+		const output = '# Heading\n\n## Boop\n\nBeep\n\n## Conclusion\n'
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 2,
+			insertionAst: {
+				type: 'text',
+				value: 'Beep',
+			},
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
+
 	test('it works with a different heading depth', async () => {
 		const input = '# Heading\n### Boop\n\nSome text here'
 		const output = '# Heading\n\n### Boop\n\nBeep\n'
