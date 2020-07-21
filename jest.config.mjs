@@ -1,8 +1,8 @@
 export default {
-	preset: "ts-jest",
+	preset: 'ts-jest',
 	globals: {
-		"ts-jest": {
-			packageJson: "package.json",
+		'ts-jest': {
+			packageJson: 'package.json',
 		},
 	},
-};
+}

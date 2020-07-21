@@ -6,7 +6,7 @@ export interface IRemarkInsert {
 
 export default function remarkInsert(opts: IRemarkInsert) {
 	return function transformer(ast: any, file: any) {
-		const licenseHeading = {
+		const heading = {
 			type: 'heading',
 			depth: opts.headingDepth,
 			children: [
@@ -18,7 +18,6 @@ export default function remarkInsert(opts: IRemarkInsert) {
 		}
 
 		for (let i = 0; i < ast.children.length; ++i) {
-			const node = ast.children[i]
 			// if the first element is not a heading, add it
 			if (
 				ast.children[i].type === 'heading' &&
@@ -29,7 +28,7 @@ export default function remarkInsert(opts: IRemarkInsert) {
 			}
 		}
 
-		ast.children.push(licenseHeading)
+		ast.children.push(heading)
 		ast.children.push(opts.insertionAst)
 	}
 }

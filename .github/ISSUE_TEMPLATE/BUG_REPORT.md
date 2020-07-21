@@ -25,8 +25,8 @@ if applicable, add screenshots to help explain your problem
 **device information**
 device and browser configuration / environment
 
-- operating system
-- browser and version
+-  operating system
+-  browser and version
 
 **additional context**
 add any other context about the problem here
