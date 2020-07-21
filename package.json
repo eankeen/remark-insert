@@ -2,10 +2,16 @@
 	"name": "@fox-land/remark-insert",
 	"version": "0.1.0",
 	"main": "build",
+	"files": [
+		"build"
+	],
 	"scripts": {
 		"build": "tsc",
 		"test": "jest",
 		"prepublishOnly": "npm run build"
+	},
+	"peerDependencies": {
+		"remark": ">=12.0.0"
 	},
 	"devDependencies": {
 		"@types/jest": "^26.0.5",
