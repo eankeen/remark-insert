@@ -123,4 +123,21 @@ describe('remark-insert', () => {
 
 		expect(vfile.contents).toBe(output)
 	})
+
+	test('it works with code blocks', async () => {
+		const input = '# Heading\n### Boop\n\n```js\nlet a = 4\n```'
+		const output = '# Heading\n\n### Boop\n\n```js\nlet a = 4\n```\n'
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 3,
+			insertionAst: {
+				type: 'code',
+				lang: 'js',
+				value: 'let a = 4',
+			},
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
 })
