@@ -1,12 +1,27 @@
+import remark from 'remark'
 import { nodeMatchesUserSpecifiedHeading, nextNodeIsEnd } from './util'
 
-export interface IRemarkInsert {
+interface IRemarkInsertBase {
 	headingText: string
 	headingDepth: number
+}
+
+interface IRemarkInsertAst extends IRemarkInsertBase {
 	insertionAst: Record<string, any>
 }
 
+interface IRemarkInsertText extends IRemarkInsertBase {
+	insertionText: string
+}
+
+export type IRemarkInsert = IRemarkInsertAst | IRemarkInsertText
+
 export default function remarkInsert(opts: IRemarkInsert) {
+	if ((opts as IRemarkInsertText).insertionText) {
+		;(opts as IRemarkInsertAst).insertionAst = remark().parse(
+			(opts as IRemarkInsertText).insertionText
+		)
+	}
 	return function transformer(ast: any, file: any) {
 		const heading = {
 			type: 'heading',
@@ -25,7 +40,11 @@ export default function remarkInsert(opts: IRemarkInsert) {
 				// if the next node is the last node (the ending), then
 				// we insert the user's content
 				if (nextNodeIsEnd(ast, i, opts)) {
-					ast.children.splice(i + 1, 0, opts.insertionAst)
+					ast.children.splice(
+						i + 1,
+						0,
+						(opts as IRemarkInsertAst).insertionAst
+					)
 				}
 				// the next node is removemable. let's remove it
 				else {
@@ -42,6 +61,6 @@ export default function remarkInsert(opts: IRemarkInsert) {
 		// zero. or the heading the user wants to replace was
 		// not found
 		ast.children.push(heading)
-		ast.children.push(opts.insertionAst)
+		ast.children.push((opts as IRemarkInsertAst).insertionAst)
 	}
 }

@@ -10,7 +10,7 @@ function doRemark(input: string, options: IRemarkInsert): Promise<any> {
 		})
 }
 
-describe("works with 'replaceAllSubContent' set to false", () => {
+describe('works normally', () => {
 	test('it works on empty file', async () => {
 		const input = ''
 		const output = `## License
@@ -260,9 +260,7 @@ let a = 4
 
 		expect(vfile.contents).toBe(output)
 	})
-})
 
-describe("works with 'replaceAllSubContent' set to true", () => {
 	test('it works with multiple sub-sub-headings', async () => {
 		const input = `# Heading
 ### Boop
@@ -319,6 +317,44 @@ let a = 4
 				lang: 'js',
 				value: 'let a = 4',
 			},
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
+})
+
+describe('test passing in markdown string', () => {
+	test('using inserttionText option works', async () => {
+		const input = '# Heading'
+		const output = `# Heading
+
+## Boop
+
+Beep
+`
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 2,
+			insertionText: 'Beep',
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
+
+	test('using inserttionText option works with extra newlines', async () => {
+		const input = '# Heading'
+		const output = `# Heading
+
+## Boop
+
+Beep
+`
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 2,
+			insertionText: '\n\nBeep',
 		})
 
 		expect(vfile.contents).toBe(output)
