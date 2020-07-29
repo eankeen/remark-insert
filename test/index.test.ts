@@ -1,5 +1,5 @@
 import remark from 'remark'
-import remarkInsert, { IRemarkInsert } from '../src'
+import remarkInsert, { IRemarkInsert } from '../src/index'
 
 function doRemark(input: string, options: IRemarkInsert): Promise<any> {
 	return remark()
@@ -10,10 +10,13 @@ function doRemark(input: string, options: IRemarkInsert): Promise<any> {
 		})
 }
 
-describe('remark-insert', () => {
+describe("works with 'replaceAllSubContent' set to false", () => {
 	test('it works on empty file', async () => {
 		const input = ''
-		const output = '## License\n\nLicensed under Apache-2.0\n'
+		const output = `## License
+
+Licensed under Apache-2.0
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'License',
@@ -29,7 +32,10 @@ describe('remark-insert', () => {
 
 	test('it works with only-title file ', async () => {
 		const input = '## License'
-		const output = '## License\n\nLicensed under MIT\n'
+		const output = `## License
+
+Licensed under MIT
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'License',
@@ -44,8 +50,14 @@ describe('remark-insert', () => {
 	})
 
 	test('it works with single-title and text file', async () => {
-		const input = '## Boop\n\nsome text here'
-		const output = '## Boop\n\nBeep\n'
+		const input = `## Boop
+
+some text here
+`
+		const output = `## Boop
+
+Beep
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'Boop',
@@ -61,7 +73,12 @@ describe('remark-insert', () => {
 
 	test('it works with a separate heading', async () => {
 		const input = '# Heading'
-		const output = '# Heading\n\n## Boop\n\nBeep\n'
+		const output = `# Heading
+
+## Boop
+
+Beep
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'Boop',
@@ -72,13 +89,84 @@ describe('remark-insert', () => {
 			},
 		})
 
-		console.log(vfile.contents)
+		expect(vfile.contents).toBe(output)
+	})
+
+	test('it works with a separate heading not specified', async () => {
+		const input = `# Heading
+
+## Nest
+
+#### Subnest`
+		const output = `# Heading
+
+## Nest
+
+#### Subnest
+
+##### Boop
+
+Beep
+`
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 5,
+			insertionAst: {
+				type: 'text',
+				value: 'Beep',
+			},
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
+
+	test('it works with a separate heading specified', async () => {
+		const input = `# Heading
+
+## Nest
+
+#### Subnest
+
+##### Boop
+
+## Misc`
+		const output = `# Heading
+
+## Nest
+
+#### Subnest
+
+##### Boop
+
+Beep
+
+## Misc
+`
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 5,
+			insertionAst: {
+				type: 'text',
+				value: 'Beep',
+			},
+		})
+
 		expect(vfile.contents).toBe(output)
 	})
 
 	test('it works with a separate heading and itself', async () => {
-		const input = '# Heading\n## Boop\n\nSome text here'
-		const output = '# Heading\n\n## Boop\n\nBeep\n'
+		const input = `# Heading
+## Boop
+
+Some text here`
+		const output = `# Heading
+
+## Boop
+
+Beep
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'Boop',
@@ -93,8 +181,18 @@ describe('remark-insert', () => {
 	})
 
 	test('it works with a postfixed heading', async () => {
-		const input = '# Heading\n## Boop\n\n## Conclusion'
-		const output = '# Heading\n\n## Boop\n\nBeep\n\n## Conclusion\n'
+		const input = `# Heading
+## Boop
+
+## Conclusion`
+		const output = `# Heading
+
+## Boop
+
+Beep
+
+## Conclusion
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'Boop',
@@ -109,8 +207,16 @@ describe('remark-insert', () => {
 	})
 
 	test('it works with a different heading depth', async () => {
-		const input = '# Heading\n### Boop\n\nSome text here'
-		const output = '# Heading\n\n### Boop\n\nBeep\n'
+		const input = `# Heading
+### Boop
+
+Some text here`
+		const output = `# Heading
+
+### Boop
+
+Beep
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'Boop',
@@ -125,11 +231,88 @@ describe('remark-insert', () => {
 	})
 
 	test('it works with code blocks', async () => {
-		const input = '# Heading\n### Boop\n\n```js\nlet a = 4\n```'
-		const output = '# Heading\n\n### Boop\n\n```js\nlet a = 4\n```\n'
+		const input = `# Heading
+### Boop
+
+\`\`\`js
+let a = 300
+\`\`\`
+`
+
+		const output = `# Heading
+
+### Boop
+
+\`\`\`js
+let a = 4
+\`\`\`
+`
 
 		const vfile = await doRemark(input, {
 			headingText: 'Boop',
+			headingDepth: 3,
+			insertionAst: {
+				type: 'code',
+				lang: 'js',
+				value: 'let a = 4',
+			},
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
+})
+
+describe("works with 'replaceAllSubContent' set to true", () => {
+	test('it works with multiple sub-sub-headings', async () => {
+		const input = `# Heading
+### Boop
+
+#### Foo
+#### Bar
+##### Others`
+		const output = `# Heading
+
+### Boop
+
+\`\`\`js
+let a = 4
+\`\`\`
+`
+
+		const vfile = await doRemark(input, {
+			headingText: 'Boop',
+			headingDepth: 3,
+			insertionAst: {
+				type: 'code',
+				lang: 'js',
+				value: 'let a = 4',
+			},
+		})
+
+		expect(vfile.contents).toBe(output)
+	})
+
+	test('it works with multiple sub-sub-headings and an actual ending', async () => {
+		const input = `# Heading
+### One
+
+#### Alfa
+#### Bravo
+##### Charlie
+### Two`
+		const output = `# Heading
+
+### One
+
+\`\`\`js
+let a = 4
+\`\`\`
+
+### Two
+`
+
+		const vfile = await doRemark(input, {
+			headingText: 'One',
 			headingDepth: 3,
 			insertionAst: {
 				type: 'code',
