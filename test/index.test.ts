@@ -1,9 +1,14 @@
 import remark from 'remark'
-import remarkInsert, { IRemarkInsert } from '../src/index'
+import remarkInsert, { IRemarkInsertAst, IRemarkInsertText } from '../src/index'
 
-function doRemark(input: string, options: IRemarkInsert): Promise<any> {
+function doRemark(
+	input: string,
+	insertion: IRemarkInsertAst | IRemarkInsertText
+): Promise<any> {
 	return remark()
-		.use(remarkInsert, options)
+		.use(remarkInsert, {
+			insertions: [insertion] as IRemarkInsertAst[],
+		})
 		.process(input)
 		.catch((err) => {
 			console.error(err)

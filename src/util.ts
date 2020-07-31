@@ -1,13 +1,13 @@
-import { IRemarkInsert } from './'
+import { IRemarkInsertAst, IRemarkInsertText } from './'
 
 export function nodeMatchesUserSpecifiedHeading(
 	ast: Record<string, any>,
 	i: number,
-	opts: IRemarkInsert
+	insertion: IRemarkInsertAst | IRemarkInsertText
 ): boolean {
 	if (
 		ast.children[i]?.type === 'heading' &&
-		ast.children[i]?.children[0].value === opts.headingText
+		ast.children[i]?.children[0].value === insertion.headingText
 	) {
 		return true
 	}
@@ -17,7 +17,7 @@ export function nodeMatchesUserSpecifiedHeading(
 export function nextNodeIsEnd(
 	ast: Record<string, any>,
 	i: number,
-	opts: IRemarkInsert
+	insertion: IRemarkInsertAst | IRemarkInsertText
 ): boolean {
 	// if the next element does not exist, we are
 	// at the last heading
@@ -27,7 +27,7 @@ export function nextNodeIsEnd(
 
 	if (
 		ast.children[i + 1].type === 'heading' &&
-		ast.children[i + 1].depth <= opts.headingDepth
+		ast.children[i + 1].depth <= insertion.headingDepth
 	) {
 		return true
 	}
