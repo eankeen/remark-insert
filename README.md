@@ -11,9 +11,9 @@ import remarkInsert from '@fox-land/remark-insert'
 remark()
 	// pass in either
 	.use(remarkInsert, {
-		headingText: 'Information'
+		headingText: 'Information',
 		headingDepth: 2,
-		insertionText: `Here is some information about x`
+		insertionText: `Here is some information about x`,
 	})
 	.process({ path, contents })
 	.then((vfile) => {
